@@ -25,8 +25,6 @@ namespace TagCloudGenerator
             return nextPoint;
         }
 
-	    public void SetCenter(Point p) => Center = p;
-
         private static Point GetCartesianCoordinates(double polarRadius, double polarAngle)
         {
             return new Point(

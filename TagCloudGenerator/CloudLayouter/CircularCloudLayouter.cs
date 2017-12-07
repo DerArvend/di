@@ -8,11 +8,15 @@ namespace TagCloudGenerator
 	public class CircularCloudLayouter : ICloudLayouter
 	{
 		private Point center;
+
 		public Point Center
 		{
 			get => center;
-			set { center = value;
-				spiral.Center = value;
+			set
+			{
+				center = value;
+				if (spiral != null)
+					spiral.Center = value;
 			}
 		}
 
@@ -23,7 +27,7 @@ namespace TagCloudGenerator
 		{
 			if (center.X < 0 || center.Y < 0)
 				throw new ArgumentOutOfRangeException("Center coordinates should be non-negative numbers");
-			
+
 			Rectangles = new List<Rectangle>();
 			this.spiral = spiral;
 			Center = center;

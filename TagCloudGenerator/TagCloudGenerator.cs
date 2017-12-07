@@ -34,21 +34,22 @@ namespace TagCloudGenerator
 			var imageSize = GetImageSize(sizes);
 
 			layouter.Center = new Point(imageSize.Width / 2, imageSize.Height / 2);
-
 			var rectangles = sizes.Select(layouter.PutNextRectangle).ToList();
+
 			var bitmap = new Bitmap(imageSize.Width, imageSize.Height);
 			var g = Graphics.FromImage(bitmap);
-			
+
 			g.FillRectangle(Brushes.White, g.ClipBounds);
 			for (int i = 0; i < data.Count; i++)
 			{
-				g.DrawString(data[i].word, 
+				g.DrawString(data[i].word,
 					new Font(font.Name, GetWordSize(data[i].count, maxCount)),
 					new SolidBrush(colorSelector(data[i].word)), rectangles[i]);
 			}
 			
 			return bitmap;
 		}
+
 
 		private float GetWordSize(int count, int maxCount)
 		{
@@ -87,11 +88,17 @@ namespace TagCloudGenerator
 			return this;
 		}
 
+		public TagCloudGenerator SetFontSize(float size)
+		{
+			font = new Font(font.Name, size);
+			return this;
+		}
+
 		#endregion
 
 		private IEnumerable<(string word, int count)> GetMostFrequentWords(string text, int count)
 		{
-			return Regex.Split(text.ToLower(), @"\W+") //split text to words in lowercase
+			return Regex.Split(text.ToLower(), @"\W+")
 				.Where(word => !string.IsNullOrEmpty(word))
 				.Where(word => !stopWords.Contains(word))
 				.Where(word => !excludingRule(word) || includingRule(word))
