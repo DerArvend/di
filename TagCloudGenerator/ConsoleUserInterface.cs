@@ -28,32 +28,78 @@ namespace TagCloudGenerator
 		public void Run()
 		{
 			var parameters = GetParameters();
-			var textFile = new FileInfo(parameters.filepath);
-			var cloud = generator.GenerateCloud(fileReader.ReadFile(textFile), parameters.maxCloudItems);
-			var outputPath = $"{textFile.FullName}.cloud.{imageFormat}";
+			var cloud = generator.GenerateCloud(fileReader.ReadFile(parameters.file), parameters.maxCloudItems);
+			var outputPath = $"{parameters.file.FullName}.cloud.{imageFormat}";
 			imageSaver.SaveImage(cloud, imageFormat, outputPath);
 			writer.WriteLine($"Cloud saved to {outputPath}");
 		}
 
-		private (string filepath, Font font, Color color, int maxCloudItems) GetParameters()
+		private (FileInfo file, Font font, Color color, int maxCloudItems) GetParameters()
 		{
-			writer.WriteLine("Enter path to file with text");
-			var filepath = reader.ReadLine();
-			writer.WriteLine("Enter font name");
-			var fontName = reader.ReadLine();
-			writer.WriteLine("Enter font size");
-			var stringFontSize = reader.ReadLine();
-			if (!float.TryParse(stringFontSize, out var fontSize))
-				throw new ArgumentException("Invalid color size");
-			writer.WriteLine("Enter maximum cloud items count");
-			var stringMaxCloudItems = reader.ReadLine();
-			if (!int.TryParse(stringMaxCloudItems, out var maxCloudItems) || maxCloudItems <= 0)
-				throw new ArgumentException("Maximum cloud items count should be positive integer");
+			var file = GetTextFile();
+			var fontName = GetFontName();
+			var fontSize = GetFontSize();
+			var maxCloudItems = GetMaxCloudItems();
+
 			writer.WriteLine("Enter color");
 			var stringColor = reader.ReadLine();
 
-			return (filepath: filepath, font: new Font(fontName, fontSize), color: Color.FromName(stringColor),
+			return (file: file, font: new Font(fontName, fontSize), color: Color.FromName(stringColor),
 				maxCloudItems: maxCloudItems);
 		}
+
+		private int GetMaxCloudItems()
+		{
+			writer.WriteLine("Enter maximum cloud items count");
+			while (true)
+			{
+				var stringMaxCloudItems = reader.ReadLine();
+				if (int.TryParse(stringMaxCloudItems, out var maxCloudItems) && maxCloudItems > 0)
+					return maxCloudItems;
+				writer.WriteLine("Maximum cloud items count should be positive integer");
+			}
+		}
+
+		private FileInfo GetTextFile()
+		{
+			writer.WriteLine("Enter path to file with text");
+			while (true)
+			{
+				var filepath = reader.ReadLine();
+				if (File.Exists(filepath))
+					return new FileInfo(filepath);
+				writer.WriteLine("Incorrect file path");
+			}
+		}
+
+		private string GetFontName()
+		{
+			writer.WriteLine("Enter font");
+			while (true)
+			{
+				var name = reader.ReadLine();
+				try
+				{
+					new Font(name, 12);
+					return name;
+				}
+				catch
+				{
+					writer.WriteLine("Incorrect font name");
+				}
+			}
+		}
+
+		private float GetFontSize()
+		{
+			writer.WriteLine("Enter font size");
+			while (true)
+			{
+				var wasParsed = float.TryParse(reader.ReadLine(), out var fontSize);
+				if (wasParsed && fontSize >= 6)
+					return fontSize;
+				writer.WriteLine("Size must be 6 or more");
+			}
+		} 
 	}
 }

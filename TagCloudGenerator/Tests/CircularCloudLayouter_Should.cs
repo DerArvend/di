@@ -33,9 +33,9 @@ namespace TagCloudGenerator.Tests
 		[TestCase(0, 5)]
 		[TestCase(5, 0)]
 		[TestCase(0, 0)]
-		public void LayouterShoudThrow_WhenPuttingEmptyRectangle(int width, int heigth)
+		public void LayouterShouldThrow_WhenPuttingEmptyRectangle(int width, int height)
 		{
-			Action act = () => layouter.PutNextRectangle(width, heigth);
+			Action act = () => layouter.PutNextRectangle(width, height);
 			act.ShouldThrow<ArgumentException>();
 		}
 
