@@ -78,6 +78,7 @@
     <Compile Include="IImageSaver.cs" />
     <Compile Include="ITagCloudGenerator.cs" />
     <Compile Include="IUserInterface.cs" />
+    <Compile Include="ParametersParser.cs" />
     <Compile Include="Result\Result.cs" />
     <Compile Include="Tests\Result_Should.cs" />
     <Compile Include="TagCloudGenerator.cs" />

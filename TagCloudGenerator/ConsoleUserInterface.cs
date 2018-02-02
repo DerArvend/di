@@ -40,12 +40,9 @@ namespace TagCloudGenerator
 			var fontName = GetFontName();
 			var fontSize = GetFontSize();
 			var maxCloudItems = GetMaxCloudItems();
+			var color = GetColor();
 
-			writer.WriteLine("Enter color");
-			var stringColor = reader.ReadLine();
-
-			return (file: file, font: new Font(fontName, fontSize), color: Color.FromName(stringColor),
-				maxCloudItems: maxCloudItems);
+			return (file: file, font: new Font(fontName, fontSize), color: color, maxCloudItems: maxCloudItems);
 		}
 
 		private int GetMaxCloudItems()
@@ -53,10 +50,10 @@ namespace TagCloudGenerator
 			writer.WriteLine("Enter maximum cloud items count");
 			while (true)
 			{
-				var stringMaxCloudItems = reader.ReadLine();
-				if (int.TryParse(stringMaxCloudItems, out var maxCloudItems) && maxCloudItems > 0)
-					return maxCloudItems;
-				writer.WriteLine("Maximum cloud items count should be positive integer");
+				var max = ParametersParser.ParseMaxCloudItems(reader.ReadLine());
+				if (max.IsSuccess)
+					return max.Value;
+				writer.WriteLine(max.Error);
 			}
 		}
 
@@ -65,10 +62,10 @@ namespace TagCloudGenerator
 			writer.WriteLine("Enter path to file with text");
 			while (true)
 			{
-				var filepath = reader.ReadLine();
-				if (File.Exists(filepath))
-					return new FileInfo(filepath);
-				writer.WriteLine("Incorrect file path");
+				var fileResult = ParametersParser.ParseFileInfo(reader.ReadLine());
+				if (fileResult.IsSuccess)
+					return fileResult.Value;
+				writer.WriteLine(fileResult.Error);
 			}
 		}
 
@@ -77,17 +74,12 @@ namespace TagCloudGenerator
 			writer.WriteLine("Enter font");
 			while (true)
 			{
-				var name = reader.ReadLine();
-				try
-				{
-					new Font(name, 12);
-					return name;
-				}
-				catch
-				{
-					writer.WriteLine("Incorrect font name");
-				}
+				var fontNameResult = ParametersParser.ValidateFontName(reader.ReadLine());
+				if (fontNameResult.IsSuccess)
+					return fontNameResult.Value;
+				writer.WriteLine(fontNameResult.Error);
 			}
+			
 		}
 
 		private float GetFontSize()
@@ -95,11 +87,23 @@ namespace TagCloudGenerator
 			writer.WriteLine("Enter font size");
 			while (true)
 			{
-				var wasParsed = float.TryParse(reader.ReadLine(), out var fontSize);
-				if (wasParsed && fontSize >= 6)
-					return fontSize;
-				writer.WriteLine("Size must be 6 or more");
+				var fontSizeResult = ParametersParser.ParseFontSize(reader.ReadLine());
+				if (fontSizeResult.IsSuccess)
+					return fontSizeResult.Value;
+				writer.WriteLine(fontSizeResult.Error);
 			}
-		} 
+		}
+
+		private Color GetColor()
+		{
+			writer.WriteLine("Enter font color");
+			while (true)
+			{
+				var colorResult = ParametersParser.ParseColor(reader.ReadLine());
+				if (colorResult.IsSuccess)
+					return colorResult.Value;
+				writer.WriteLine(colorResult.Error);
+			}
+		}
 	}
 }
