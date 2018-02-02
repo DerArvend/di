@@ -2,6 +2,7 @@
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using TagCloudGenerator.Result;
 
 namespace TagCloudGenerator
 {
@@ -36,73 +37,25 @@ namespace TagCloudGenerator
 
 		private (FileInfo file, Font font, Color color, int maxCloudItems) GetParameters()
 		{
-			var file = GetTextFile();
-			var fontName = GetFontName();
-			var fontSize = GetFontSize();
-			var maxCloudItems = GetMaxCloudItems();
-			var color = GetColor();
+			var file = ReadParameter("Enter file path", ParametersParser.ParseFileInfo);
+			var fontName = ReadParameter("Enter font name", ParametersParser.ValidateFontName);
+			var fontSize = ReadParameter("Enter font size", ParametersParser.ParseFontSize);
+			var maxCloudItems = ReadParameter("Enter max cloud items", ParametersParser.ParseMaxCloudItems);
+			var color = ReadParameter("Enter color", ParametersParser.ParseColor);
 
 			return (file: file, font: new Font(fontName, fontSize), color: color, maxCloudItems: maxCloudItems);
 		}
 
-		private int GetMaxCloudItems()
-		{
-			writer.WriteLine("Enter maximum cloud items count");
-			while (true)
-			{
-				var max = ParametersParser.ParseMaxCloudItems(reader.ReadLine());
-				if (max.IsSuccess)
-					return max.Value;
-				writer.WriteLine(max.Error);
-			}
-		}
 
-		private FileInfo GetTextFile()
+		private T ReadParameter<T>(string message, Func<string, Result<T>> validator)
 		{
-			writer.WriteLine("Enter path to file with text");
+			writer.WriteLine(message);
 			while (true)
 			{
-				var fileResult = ParametersParser.ParseFileInfo(reader.ReadLine());
-				if (fileResult.IsSuccess)
-					return fileResult.Value;
-				writer.WriteLine(fileResult.Error);
-			}
-		}
-
-		private string GetFontName()
-		{
-			writer.WriteLine("Enter font");
-			while (true)
-			{
-				var fontNameResult = ParametersParser.ValidateFontName(reader.ReadLine());
-				if (fontNameResult.IsSuccess)
-					return fontNameResult.Value;
-				writer.WriteLine(fontNameResult.Error);
-			}
-			
-		}
-
-		private float GetFontSize()
-		{
-			writer.WriteLine("Enter font size");
-			while (true)
-			{
-				var fontSizeResult = ParametersParser.ParseFontSize(reader.ReadLine());
-				if (fontSizeResult.IsSuccess)
-					return fontSizeResult.Value;
-				writer.WriteLine(fontSizeResult.Error);
-			}
-		}
-
-		private Color GetColor()
-		{
-			writer.WriteLine("Enter font color");
-			while (true)
-			{
-				var colorResult = ParametersParser.ParseColor(reader.ReadLine());
-				if (colorResult.IsSuccess)
-					return colorResult.Value;
-				writer.WriteLine(colorResult.Error);
+				var result = validator(reader.ReadLine());
+				if (result.IsSuccess)
+					return result.Value;
+				writer.WriteLine(result.Error);
 			}
 		}
 	}
